@@ -14,7 +14,55 @@ services:
     ports:
       - "5432:5432"
 
-# TODO добавить сервисы
+  gateway_service:
+    build: services
+    container_name: gateway_service
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - library_system
+      - rating_system
+      - reservation_system
+    volumes:
+      - ./services/gateway_service:/var/www/html
+      - ./services/db_connect:/var/www/html/db_connect
+
+  reservation_system:
+    build: services
+    container_name: reservation_system
+    restart: always
+    ports:
+      - "8070:80"
+    depends_on:
+      - postgres
+    volumes:
+      - ./services/reservation_system:/var/www/html
+      - ./services/db_connect:/var/www/html/db_connect
+
+  library_system:
+    build: services
+    container_name: library_system
+    restart: always
+    ports:
+      - "8060:80"
+    depends_on:
+      - postgres
+    volumes:
+      - ./services/library_system:/var/www/html
+      - ./services/db_connect:/var/www/html/db_connect
+
+  rating_system:
+    build: services
+    container_name: rating_system
+    restart: always
+    ports:
+      - "8050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - ./services/rating_system:/var/www/html
+      - ./services/db_connect:/var/www/html/db_connect
 
 volumes:
   db-data:
