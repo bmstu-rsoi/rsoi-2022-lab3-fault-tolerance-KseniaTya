@@ -41,12 +41,12 @@ jobs:
           curl http://localhost:8080/test?id_test=drop_all_tables.php
 
       - name: Run API Tests
-        uses: matt-ball/newman-action@master
-        with:
-          collection: v4/postman/collection.json
-          environment: v4/postman/environment.json
-          delayRequest: 100
-          reporters: '[ "cli" ]'
+        timeout-minutes: 5
+        run: ./scripts/test-script.sh
+        env:
+          VARIANT: v4
+          SERVICE_NAME: rating_system
+          PORT_NUMBER: 8050
 
       - uses: education/autograding@v1
         id: autograder
@@ -57,7 +57,7 @@ jobs:
         with:
           google_token: ${{secrets.GOOGLE_API_KEY}}
           sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
-          homework_number: 2
+          homework_number: 3
           user_column: 'D'
           column_offset: 'F'
           mark: "'+"
