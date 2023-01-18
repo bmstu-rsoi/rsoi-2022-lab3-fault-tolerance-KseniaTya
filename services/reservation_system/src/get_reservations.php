@@ -9,4 +9,4 @@ $result = pg_fetch_all(pg_query($connect,
     "select * from reservation where username='$username'"
 ));
 
-echo json_encode($result[0]);
+echo json_encode($result);

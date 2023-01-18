@@ -14,3 +14,4 @@ pg_query($connect, "
                 VALUES('$uuid', '$username', '$book_uid', '$library_uid', 'RENTED', '".date('Y-m-d H:i:s')."', '".$till_date."');
             ");
 
+echo $uuid;
