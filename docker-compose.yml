@@ -19,7 +19,6 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "6379:6379"
-
   gateway_service:
     build: services
     container_name: gateway_service
@@ -33,7 +32,6 @@ services:
     volumes:
       - ./services/gateway_service:/var/www/html
       - ./services/db_connect:/var/www/html/db_connect
-    #command: composer install --prefer-source --no-interaction
 
   reservation_system:
     build: services
