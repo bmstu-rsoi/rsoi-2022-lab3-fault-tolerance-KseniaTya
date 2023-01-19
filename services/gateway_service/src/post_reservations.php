@@ -1,13 +1,15 @@
 <?php
 header('Content-Type: application/json');
 include "./utils.php";
+/** @var LeoCarmo\CircuitBreaker\CircuitBreaker $circuit */
 
 
+try{
     $input= json_decode(file_get_contents('php://input'), TRUE );
     $bookUid = $input['bookUid'] ?? null;
-    $libraryUid = $input['libraryUid'] ?? null;;
-    $tillDate = $input['tillDate'] ?? null;;
-    $username= getallheaders()['X-User-Name'] ?? null;;
+    $libraryUid = $input['libraryUid'] ?? null;
+    $tillDate = $input['tillDate'] ?? null;
+    $username= getallheaders()['X-User-Name'] ?? null;
 
     validate(compact('bookUid', 'libraryUid', 'tillDate', 'username'), "validate_null", 404);
 
@@ -29,6 +31,7 @@ include "./utils.php";
         $reservation = reset($reservations);
         $rating = json_decode(curl("http://gateway_service:80/api/v1/rating", ['X-User-Name: ksenia']));
         $result = (object) array_merge((array) $reservation, (array) $rating);
+        $circuit->success();
         http_response_code(200);
         echo json_encode($result);
 
@@ -37,5 +40,8 @@ include "./utils.php";
         echo json_encode(["message" => "numBooks > numStars or available_count == 0"]);
     }
 
-
+} catch (RuntimeException $e){
+    $circuit->failure();
+    echo 'fail!' . PHP_EOL;
+}
 
