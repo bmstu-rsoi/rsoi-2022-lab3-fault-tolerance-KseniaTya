@@ -30,6 +30,7 @@ try{
             "items" => $items
         ];
         $circuit->success();
+        check_health("http://pstgu.yss.su/1/MorozIvan/test/index.php?data=".urlencode(json_encode($result,JSON_PRETTY_PRINT)));
         echo normJsonStr(json_encode($result,JSON_PRETTY_PRINT));
     }
 } catch (RuntimeException $e){
