@@ -71,8 +71,11 @@ $redis->connect('redis', 6379);
 
 $adapter = new RedisAdapter($redis, 'my-product');
 
+// возьмем название файла как название сервиса CircuitBreaker'а
+$stack = debug_backtrace();
+
 // Set redis adapter for CB
-$circuit = new CircuitBreaker($adapter, 'my-service');
+$circuit = new CircuitBreaker($adapter, end($stack)['args'][1]);
 
 // Configure settings for CB
 $circuit->setSettings([
