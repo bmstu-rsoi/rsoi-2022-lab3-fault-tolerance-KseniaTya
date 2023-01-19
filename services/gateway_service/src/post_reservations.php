@@ -43,6 +43,6 @@ try{
 } catch (RuntimeException $e){
     $circuit->failure();
     http_response_code(503);
-    echo 'fail!' . PHP_EOL;
+    echo "{}";
 }
 
