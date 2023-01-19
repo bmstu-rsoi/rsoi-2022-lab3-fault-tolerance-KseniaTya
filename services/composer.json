@@ -1,8 +1,0 @@
-{
-    "name": "test/app",
-    "description": "Simple PHP Composer app",
-    "type": "project",
-    "require": {
-        "leocarmo/circuit-breaker-php": "^5.0.0"
-    }
-}
