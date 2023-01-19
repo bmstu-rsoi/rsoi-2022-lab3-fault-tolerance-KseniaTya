@@ -33,6 +33,7 @@ services:
     volumes:
       - ./services/gateway_service:/var/www/html
       - ./services/db_connect:/var/www/html/db_connect
+    #command: composer install --prefer-source --no-interaction
 
   reservation_system:
     build: services
