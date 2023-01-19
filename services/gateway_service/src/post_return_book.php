@@ -5,7 +5,6 @@ include "./utils.php";
 try{
 
     header('Content-Type: application/json; charset=utf-8');
-    include "./utils.php";
     $input = json_decode( file_get_contents('php://input'), TRUE );
 
     $condition = $input['condition'] ?? null;
@@ -40,9 +39,9 @@ try{
             $stars+= 1;
         }
         curl("http://rating_system:80/change_rating?username=$username&stars=$stars");
-        http_response_code(204);
-        $circuit->success();
 
+        $circuit->success();
+        http_response_code(204);
         echo ("
             \"condition\": \"$condition\",
             \"date\": \"$arr->till_date\"
