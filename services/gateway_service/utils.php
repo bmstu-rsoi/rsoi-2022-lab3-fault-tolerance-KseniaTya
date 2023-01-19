@@ -61,7 +61,7 @@ function normJsonStr($str){
     return iconv('cp1251', 'utf-8', $str);
 }
 
-
+require_once __DIR__ . '/vendor/autoload.php';
 use LeoCarmo\CircuitBreaker\CircuitBreaker;
 use LeoCarmo\CircuitBreaker\Adapters\RedisAdapter;
 // Connect to redis
