@@ -1,5 +1,9 @@
-<?php
-header('Content-Type: application/json; charset=utf-8');
+<?php declare(strict_types=1);
+/** @var LeoCarmo\CircuitBreaker\CircuitBreaker $circuit */
+include "./utils.php";
+
+try {
+    header('Content-Type: application/json; charset=utf-8');
     $username= getallheaders()['X-User-Name'] ?? "Test_User";
     $username = urlencode($username);
     include "./utils.php";
@@ -27,5 +31,13 @@ header('Content-Type: application/json; charset=utf-8');
             ]
         ];
     }, $reservations);
+    $circuit->success();
 
-echo json_encode($result);
+    echo json_encode($result);
+}
+catch (RuntimeException $e){
+    $circuit->failure();
+    echo 'fail!' . PHP_EOL;
+}
+
+
