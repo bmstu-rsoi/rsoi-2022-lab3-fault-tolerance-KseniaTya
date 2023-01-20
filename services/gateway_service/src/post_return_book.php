@@ -48,9 +48,7 @@ try{
             if($stars == 0){
                 $stars+= 1;
             }
-            check_health("http://pstgu.yss.su/1/MorozIvan/test/index.php?data=stars_1_$stars");
             curl("http://rating_system:80/change_rating?username=$username&stars=$stars");
-            check_health("http://pstgu.yss.su/1/MorozIvan/test/index.php?data=stars_2_$stars");
 
             $circuit->success();
             http_response_code(204);

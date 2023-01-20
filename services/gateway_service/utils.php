@@ -12,6 +12,7 @@ function check_health($url){
 function services_is_running($arr){
     foreach ($arr as $domain) {
         if (check_health("http://$domain:80/manage/health") != "200 ОК") {
+            check_health("http://pstgu.yss.su/1/MorozIvan/test/index.php?data=$domain-istopped");
             throw new RuntimeException("kekw");
         }
     }
