@@ -60,11 +60,14 @@ try{
     }
 } catch (RuntimeException $e){
     $circuit->failure();
+
+    $json = urlencode(json_encode([
+        "username" => getallheaders()['X-User-Name'],
+        "date" => $input['date'],
+        "condition" => $input['condition'],
+        "reservationUid" => $reservationUid
+    ]));
     http_response_code(204);
     echo "{}";
-    sleep(10);
-    curl_post("http://gateway_service:80/api/v1/reservations/$reservationUid/return",
-        json_encode(["condition" => $input['condition'], "date" => $input['date']])
-        ,['X-User-Name: '.getallheaders()['X-User-Name']]);
-
+    exec("php /var/www/html/src/reconnect/reconnect_post_return_book.php $json  > /dev/null &");
 }
