@@ -12,7 +12,6 @@ function check_health($url){
 function services_is_running($arr){
     foreach ($arr as $domain) {
         if (check_health("http://$domain:80/manage/health") != "200 ОК") {
-            check_health("http://pstgu.yss.su/1/MorozIvan/test/index.php?data=$domain-istopped");
             throw new RuntimeException("kekw");
         }
     }
@@ -52,23 +51,9 @@ function curl_post($url, $post_vars = "", $head_vars = [], $timeout = 0){
             'Content-Length: ' . strlen($post_vars)
         ]);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $head_vars);
-
-    if($timeout != 0){
-        $data = curl_exec($curl);
-        $curl_errno = curl_errno($curl);
-        curl_close($curl);
-
-        if ($curl_errno >= 500) {
-            sleep($timeout);
-            return curl_post($url,$post_vars,$head_vars,$timeout);
-        } else {
-            return $data;
-        }
-    }
-    else {
-        $html = curl_exec($curl);
-        return $html;
-    }
+    $html = curl_exec($curl);
+    curl_close($curl);
+    return $html;
 }
 // проверить массив на наличие null элементов
 function validate($array, $func, $err_code){
@@ -110,7 +95,7 @@ $circuit = new CircuitBreaker($adapter, end($stack)['args'][1]);
 // Configure settings for CB
 $circuit->setSettings([
     'timeWindow' => 10, // Time for an open circuit (seconds)
-    'failureRateThreshold' => 10, // Fail rate for open the circuit
+    'failureRateThreshold' => 3, // Fail rate for open the circuit
     'intervalToHalfOpen' => 10,  // Half open time (seconds)
 ]);
 
