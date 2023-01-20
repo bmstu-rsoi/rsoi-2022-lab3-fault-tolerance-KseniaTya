@@ -109,7 +109,7 @@ $circuit = new CircuitBreaker($adapter, end($stack)['args'][1]);
 // Configure settings for CB
 $circuit->setSettings([
     'timeWindow' => 30, // Time for an open circuit (seconds)
-    'failureRateThreshold' => 2, // Fail rate for open the circuit
+    'failureRateThreshold' => 10, // Fail rate for open the circuit
     'intervalToHalfOpen' => 30,  // Half open time (seconds)
 ]);
 
