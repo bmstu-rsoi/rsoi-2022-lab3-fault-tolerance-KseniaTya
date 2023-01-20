@@ -15,3 +15,5 @@ get('/get_reservations', "src/get_reservations.php");
 get('/num_books', "src/get_num_rented_books.php");
 // вернуть арендованную книгу, вернуть данные об данной арендации
 get('/return_book', "src/return_book.php");
+
+get('/change_status', "src/change_status.php");

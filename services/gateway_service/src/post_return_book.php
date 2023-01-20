@@ -16,7 +16,13 @@ try{
     $username = urlencode($username);
     $date = urlencode($input['date']);
 
+    // получаем старые данные резервации
+    $old_reservations = json_decode(curl("http://gateway_service:80/api/v1/reservations", ['X-User-Name: '.getallheaders()['X-User-Name']]));
+    $old_reservations = array_filter($old_reservations, fn($x) => $x->reservationUid == $old_reservations);
+    $old_reservation = reset($old_reservations);
+
     $reservationData = curl("http://reservation_system:80/return_book?username=$username&reservationUid=$reservationUid&date=$date");
+
     if($reservationData == "[]"){
         http_response_code(404);
     }
@@ -24,7 +30,7 @@ try{
         $arr = json_decode($reservationData);
         // увеличить счетчик доступных книг
         //$numBooks = curl("http://library_system:80/return_book?username=$username&reservationUid=$reservationUid");
-        $f = curl("http://library_system:80/count_book?book_uid=$arr->book_uid&library_uid=$arr->library_uid&count=1");
+        curl("http://library_system:80/count_book?book_uid=$arr->book_uid&library_uid=$arr->library_uid&count=1");
 
         $book = json_decode(curl("http://library_system:80/get_book_by_uid?book_uid=$arr->book_uid"));
         $stars = 0;
@@ -49,8 +55,15 @@ try{
     }
 } catch (RuntimeException $e){
     $circuit->failure();
+    // меняем кол-во доступных книг на -1 (отдаем книгу пользователю)
+    curl("http://library_system:80/count_book?book_uid=$arr->book_uid&library_uid=$arr->library_uid&count=-1");
+    // меняем состояние книги на старое
+    curl("http://library_system:80/change_condition_book?book_uid=$arr->book_uid&condition=$book->condition");
+    // меняем состояние резервации
+    $reservationData = curl("http://reservation_system:80/change_status?reservationUid=$reservationUid&status=RENTED");
+
     http_response_code(503);
-    echo "{}";
+    echo json_encode(["message"=> "$e"]);
 }
 
 

@@ -14,5 +14,5 @@ echo json_encode($result);
 } catch (RuntimeException $e){
     $circuit->failure();
     http_response_code(503);
-    echo "{}";
+    echo json_encode(["message"=> "$e"]);
 }

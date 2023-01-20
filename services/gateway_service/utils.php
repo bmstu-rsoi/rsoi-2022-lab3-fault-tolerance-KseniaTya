@@ -14,7 +14,13 @@ function curl($url, $head_vars = []){
         explode("://", $url)[1]
     )[0];
     if(check_health("http://$domain:80/manage/health") != "200 ОК"){
-        throw new RuntimeException();
+        $error = "";
+        switch ($domain){
+            case "rating_system":
+                $error = "Bonus Service unavailable";
+                break;
+        }
+        throw new RuntimeException($error);
     }
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
