@@ -2,17 +2,18 @@
 /** @var LeoCarmo\CircuitBreaker\CircuitBreaker $circuit */
 include "./utils.php";
 
+header('Content-Type: application/json; charset=utf-8');
+$input = json_decode( file_get_contents('php://input'), TRUE );
+
+$condition = $input['condition'] ?? null;
+$date = $input['date'] ?? null;
+$username= getallheaders()['X-User-Name'] ?? null;
+
+// сдать книгу и получить данные о книге из резервации
+validate(compact('condition', 'date', 'username'), "validate_null", 400);
 try{
+    services_is_running(["reservation_system", "library_system", "rating_system"]);
 
-    header('Content-Type: application/json; charset=utf-8');
-    $input = json_decode( file_get_contents('php://input'), TRUE );
-
-    $condition = $input['condition'] ?? null;
-    $date = $input['date'] ?? null;
-    $username= getallheaders()['X-User-Name'] ?? null;
-
-    // сдать книгу и получить данные о книге из резервации
-    validate(compact('condition', 'date', 'username'), "validate_null", 400);
     $username = urlencode($username);
     $date = urlencode($input['date']);
 
@@ -55,15 +56,43 @@ try{
     }
 } catch (RuntimeException $e){
     $circuit->failure();
+/*
     // меняем кол-во доступных книг на -1 (отдаем книгу пользователю)
     curl("http://library_system:80/count_book?book_uid=$arr->book_uid&library_uid=$arr->library_uid&count=-1");
     // меняем состояние книги на старое
     curl("http://library_system:80/change_condition_book?book_uid=$arr->book_uid&condition=$book->condition");
     // меняем состояние резервации
     $reservationData = curl("http://reservation_system:80/change_status?reservationUid=$reservationUid&status=RENTED");
+*/
 
-    http_response_code(503);
-    echo json_encode(["message"=> $e->getMessage()]);
+    echo curl_post("http://gateway_service:80/api/v1/reservations/$reservationUid/return",
+        json_encode(["condition" => $input['condition'], "date" => $input['date']])
+        ,['X-User-Name: '.getallheaders()['X-User-Name']], 10);
+/*    http_response_code(503);
+    echo json_encode(["message"=> $e->getMessage()]);*/
+
+
+
+  /*  $handlerStack = \GuzzleHttp\HandlerStack::create();
+    $retryMiddleware = GuzzleMiddleware::retryRequest(1);
+    $handlerStack->push($retryMiddleware);
+
+
+    $post_vars = json_encode(["condition" => $input['condition'], "date" => $input['date']]);
+    $headers = [
+        'Content-Type' => 'application/json',
+        'Content-Length' => strlen($post_vars),
+        'X-User-Name' => getallheaders()['X-User-Name'],
+
+    ];
+    $client = new \GuzzleHttp\Client([
+        'handler' => $handlerStack,
+        'headers' => $headers
+    ]);
+    $r = $client->request('POST', "http://localhost:8080/api/v1/reservations/$reservationUid/return", [
+        'body' => $post_vars
+    ]);
+    echo $r->getBody()->getContents();*/
 }
 
 

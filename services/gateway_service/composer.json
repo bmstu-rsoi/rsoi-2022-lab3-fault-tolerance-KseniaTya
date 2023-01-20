@@ -3,6 +3,7 @@
     "description": "Simple PHP Composer app",
     "type": "project",
     "require": {
-        "leocarmo/circuit-breaker-php": "^5.0.0"
+        "leocarmo/circuit-breaker-php": "^5.0.0",
+        "guzzlehttp/guzzle": "^7.5.0"
     }
 }

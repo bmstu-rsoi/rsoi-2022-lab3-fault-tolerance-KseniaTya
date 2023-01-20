@@ -8,6 +8,15 @@ function check_health($url){
     curl_close($ch);
     return $html;
 }
+// проверка здоровья списка сервисов
+function services_is_running($arr){
+    foreach ($arr as $domain) {
+        if (check_health("http://$domain:80/manage/health") != "200 ОК") {
+            throw new RuntimeException("kekw");
+        }
+    }
+}
+
 // get запрос
 function curl($url, $head_vars = []){
     $domain = explode(":",
@@ -31,7 +40,7 @@ function curl($url, $head_vars = []){
     return $html;
 }
 // post запрос
-function curl_post($url, $post_vars = "", $head_vars = []){
+function curl_post($url, $post_vars = "", $head_vars = [], $timeout = 0){
     $curl = curl_init($url);
 
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -42,9 +51,23 @@ function curl_post($url, $post_vars = "", $head_vars = []){
             'Content-Length: ' . strlen($post_vars)
         ]);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $head_vars);
-    $html = curl_exec($curl);
 
-    return $html;
+    if($timeout != 0){
+        $data = curl_exec($curl);
+        $curl_errno = curl_errno($curl);
+        curl_close($curl);
+
+        if ($curl_errno >= 500) {
+            sleep($timeout);
+            return curl_post($url,$post_vars,$head_vars,$timeout);
+        } else {
+            return $data;
+        }
+    }
+    else {
+        $html = curl_exec($curl);
+        return $html;
+    }
 }
 // проверить массив на наличие null элементов
 function validate($array, $func, $err_code){
