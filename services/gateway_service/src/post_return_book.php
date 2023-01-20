@@ -64,7 +64,7 @@ try{
     // меняем состояние резервации
     $reservationData = curl("http://reservation_system:80/change_status?reservationUid=$reservationUid&status=RENTED");
 */
-
+    http_response_code(204);
     echo curl_post("http://gateway_service:80/api/v1/reservations/$reservationUid/return",
         json_encode(["condition" => $input['condition'], "date" => $input['date']])
         ,['X-User-Name: '.getallheaders()['X-User-Name']], 10);
